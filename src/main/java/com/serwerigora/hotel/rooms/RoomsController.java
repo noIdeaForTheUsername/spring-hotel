@@ -2,6 +2,7 @@ package com.serwerigora.hotel.rooms;
 
 import com.serwerigora.hotel.rooms.dto.UpdateRoomRequest;
 import com.serwerigora.hotel.rooms.model.Room;
+import com.serwerigora.hotel.rooms.model.RoomsRepository;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class RoomsController {
     }
 
     @PostMapping
-    ResponseEntity<Void> addRoom(@Valid @RequestBody Room room) {
+    ResponseEntity<Void> createRoom(@Valid @RequestBody Room room) {
         try {
             this.repository.insert(room.number(), room.maxPersons(), room.roomClass());
             return ResponseEntity.created(URI.create("/rooms/" + room.number())).build();

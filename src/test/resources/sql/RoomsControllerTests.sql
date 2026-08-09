@@ -1,4 +1,4 @@
-TRUNCATE TABLE rooms;
+TRUNCATE TABLE rooms CASCADE;
 
 INSERT INTO rooms (number, max_persons, class)
 VALUES

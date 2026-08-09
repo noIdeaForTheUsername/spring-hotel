@@ -1,7 +1,5 @@
-package com.serwerigora.hotel.rooms;
+package com.serwerigora.hotel.rooms.model;
 
-import com.serwerigora.hotel.rooms.model.Room;
-import com.serwerigora.hotel.rooms.model.RoomClass;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;

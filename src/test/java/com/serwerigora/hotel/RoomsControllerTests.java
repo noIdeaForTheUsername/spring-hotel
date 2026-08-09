@@ -3,42 +3,30 @@ package com.serwerigora.hotel;
 import com.serwerigora.hotel.rooms.dto.UpdateRoomRequest;
 import com.serwerigora.hotel.rooms.model.Room;
 import com.serwerigora.hotel.rooms.model.RoomClass;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
 @Sql(
         scripts = "/sql/RoomsControllerTests.sql",
         executionPhase = ExecutionPhase.BEFORE_TEST_METHOD
 )
-class RoomsControllerTests {
+class RoomsControllerTests extends RestE2ETest {
 
-    @LocalServerPort
-    int port;
-
-    RestTestClient client;
     private final UpdateRoomRequest PUT_BODY = new UpdateRoomRequest(55, RoomClass.PREMIUM);
-
-    @BeforeEach
-    void setup() {
-        client = RestTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
-    }
 
     @Test
     void shouldGetRoom() {
-        expectSuccessfulGetRoom(101);
+        getValidRoom(101);
     }
 
     @Test
     void shouldGetArrayOfRooms() {
-        var rooms = client.get()
+        var rooms = rest.get()
                 .uri("/rooms")
                 .exchangeSuccessfully()
                 .expectBody(Room[].class)
@@ -49,23 +37,23 @@ class RoomsControllerTests {
 
     @Test
     void shouldCreateRoom() {
-        client.post()
+        rest.post()
                 .uri("/rooms")
                 .body(new Room(300, 5, RoomClass.STANDARD))
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CREATED);
-        expectSuccessfulGetRoom(300);
+        getValidRoom(300);
     }
 
     @Test
     void shouldNotUpdateRoomOnPost() {
-        client.post()
+        rest.post()
                 .uri("/rooms")
                 .body(new Room(101, 999, RoomClass.STANDARD))
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT);
 
-        var room = client.get()
+        var room = rest.get()
                 .uri("/rooms/101")
                 .exchange()
                 .expectBody(Room.class)
@@ -76,23 +64,23 @@ class RoomsControllerTests {
 
     @Test
     void shouldUpdateRoom() {
-        client.put()
+        rest.put()
                 .uri("/rooms/201")
                 .body(PUT_BODY)
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.NO_CONTENT);
-        Room updatedRoom = expectSuccessfulGetRoom(201);
+        Room updatedRoom = getValidRoom(201);
         assertThat(updatedRoom).isEqualTo(new Room(201, PUT_BODY.maxPersons(), PUT_BODY.roomClass()));
     }
 
     @Test
     void shouldNotCreateRoomOnPut() {
-        client.put()
+        rest.put()
                 .uri("/rooms/9876")
                 .body(PUT_BODY)
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
-        client.get()
+        rest.get()
                 .uri("/rooms/9876")
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
@@ -100,10 +88,10 @@ class RoomsControllerTests {
 
     @Test
     void shouldDeleteRoom() {
-        client.delete()
+        rest.delete()
                 .uri("/rooms/202")
                 .exchangeSuccessfully();
-        client.get()
+        rest.get()
                 .uri("/rooms/202")
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
@@ -113,9 +101,9 @@ class RoomsControllerTests {
     void endpointsShouldReturnNotFoundOnNonExistingRoom() {
         String uri = "/rooms/5678";
         var requests = new RestTestClient.RequestHeadersSpec[] {
-                client.get().uri(uri),
-                client.delete().uri(uri),
-                client.put().uri(uri).body(PUT_BODY),
+                rest.get().uri(uri),
+                rest.delete().uri(uri),
+                rest.put().uri(uri).body(PUT_BODY),
         };
         for (var request : requests) {
             request.exchange()
@@ -123,8 +111,8 @@ class RoomsControllerTests {
         }
     }
 
-    private Room expectSuccessfulGetRoom(Integer number) {
-        var result = client.get()
+    private Room getValidRoom(Integer number) {
+        var result = rest.get()
                 .uri("/rooms/" + number)
                 .exchangeSuccessfully()
                 .expectBody(Room.class)
