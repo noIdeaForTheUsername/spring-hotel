@@ -15,6 +15,5 @@ public record Room(
         @Positive
         Integer maxPersons,
         @Column(value = "class")
-        @NotNull
-        RoomClass roomClass
+        @NotNull RoomClass roomClass
 ) {}

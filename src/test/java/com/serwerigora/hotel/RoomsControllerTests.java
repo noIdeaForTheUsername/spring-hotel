@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @Sql(
-        scripts = "/sql/RoomsControllerTests.sql",
+        scripts = "/testData.sql",
         executionPhase = ExecutionPhase.BEFORE_TEST_METHOD
 )
 class RoomsControllerTests extends RestE2ETest {

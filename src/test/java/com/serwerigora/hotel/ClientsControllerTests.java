@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import static org.assertj.core.api.Assertions.*;
 
 @Sql(
-        scripts = "/sql/RoomsControllerTests.sql"
+        scripts = "/testData.sql"
 )
 public class ClientsControllerTests extends RestE2ETest {
 
@@ -46,6 +46,7 @@ public class ClientsControllerTests extends RestE2ETest {
                 .expectBody(Client.class)
                 .returnResult()
                 .getResponseBody();
+        assertThat(created.id()).isNotNull();
         assertThat(created.firstName()).isEqualTo("Nice");
         assertThat(created.lastName()).isEqualTo("Name");
         assertThat(created.phoneNumber()).isEqualTo("+48765765765");

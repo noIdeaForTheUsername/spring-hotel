@@ -25,3 +25,14 @@ VALUES
     (1, 101, '2025-01-01', '2025-01-21'),
     (3, 101, '2026-09-20', '2026-10-07')
 ON CONFLICT DO NOTHING;
+
+
+SELECT setval(
+    pg_get_serial_sequence('clients', 'id'),
+    (SELECT MAX(id) FROM clients)
+);
+
+SELECT setval(
+    pg_get_serial_sequence('reservations', 'id'),
+    (SELECT MAX(id) FROM reservations)
+);
